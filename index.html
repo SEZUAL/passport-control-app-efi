@@ -1,0 +1,1656 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>US Passport Control Interview Trainer - v1 (Desktop)</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <style>
+    :root{
+      --bg:#0b1220;
+      --panel:#0f172a;
+      --panel2:#111c33;
+      --stroke:#1f2a44;
+      --text:#e5e7eb;
+      --muted:#a7b0c0;
+      --accent:#3b82f6;
+      --good:#22c55e;
+      --warn:#f59e0b;
+      --bad:#ef4444;
+      --card:#0b1020;
+    }
+    *{ box-sizing:border-box; font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif; }
+    body{ margin:0; background:linear-gradient(180deg,var(--bg),#050914); color:var(--text); min-height:100vh; display:flex; justify-content:center; align-items:flex-start; }
+    .app{ width:100%; max-width:1200px; padding:14px; display:flex; flex-direction:column; gap:10px; }
+    .topbar{
+      display:flex; gap:10px; align-items:flex-start; justify-content:space-between; flex-wrap:wrap;
+      border:1px solid var(--stroke); background:rgba(15,23,42,0.7); border-radius:12px; padding:10px;
+    }
+    .title{ font-weight:800; letter-spacing:0.2px; font-size:1.05rem; }
+    .subtitle{ margin-top:2px; color:var(--muted); font-size:0.78rem; max-width:560px; line-height:1.25; }
+    .controls{ display:flex; gap:8px; flex-wrap:wrap; align-items:center; }
+    select, button, label.control, input[type="checkbox"]{ font-size:0.82rem; }
+    select, button, label.control{
+      border:1px solid var(--stroke);
+      background:rgba(17,28,51,0.9);
+      color:var(--text);
+      border-radius:10px;
+      padding:7px 10px;
+    }
+    button{ cursor:pointer; font-weight:700; }
+    button.primary{ background:linear-gradient(180deg,#2563eb,#1d4ed8); border-color:#2349c7; }
+    button.secondary{ background:rgba(17,28,51,0.9); }
+    button.danger{ background:rgba(239,68,68,0.15); border-color:rgba(239,68,68,0.35); }
+    button:disabled{ opacity:0.55; cursor:default; }
+    label.control{ display:flex; gap:8px; align-items:center; }
+    .layout{
+      display:grid;
+      grid-template-columns: minmax(0,1fr) minmax(0,1.25fr) minmax(0,1fr);
+      gap:10px;
+      align-items:stretch;
+    }
+    @media (max-width: 980px){ .layout{ grid-template-columns: 1fr; } }
+    .panel{
+      border:1px solid var(--stroke);
+      background:rgba(15,23,42,0.65);
+      border-radius:12px;
+      padding:10px;
+      box-shadow:0 10px 30px rgba(0,0,0,0.25);
+    }
+    .panel h2{
+      margin:0 0 6px;
+      font-size:0.78rem;
+      text-transform:uppercase;
+      letter-spacing:0.12em;
+      color:var(--muted);
+    }
+
+    .officerRow{ display:flex; gap:10px; align-items:center; }
+    .avatar{
+      width:86px; height:86px; border-radius:14px;
+      border:1px solid var(--stroke);
+      background:linear-gradient(135deg,rgba(59,130,246,0.25),rgba(15,23,42,0.2));
+      display:flex; align-items:center; justify-content:center;
+      font-weight:900; color:rgba(229,231,235,0.85);
+      flex-shrink:0;
+      position:relative;
+      overflow:hidden;
+    }
+    .avatar::after{
+      content:"";
+      position:absolute; inset:-40%;
+      background:radial-gradient(circle,rgba(255,255,255,0.14),transparent 60%);
+      transform:rotate(25deg);
+    }
+    .officerMeta{ display:flex; flex-direction:column; gap:4px; }
+    .metaLine{ font-size:0.8rem; font-weight:800; }
+    .metaSub{ font-size:0.74rem; color:var(--muted); }
+
+    .bubble{
+      border:1px solid rgba(59,130,246,0.35);
+      background:rgba(59,130,246,0.10);
+      border-radius:14px;
+      padding:12px;
+      min-height:110px;
+      font-size:1.02rem;
+      line-height:1.25;
+      display:flex; flex-direction:column; gap:8px;
+    }
+    .bubble small{ color:var(--muted); font-size:0.78rem; }
+    .qActions{ display:flex; gap:8px; flex-wrap:wrap; margin-top:10px; }
+    .qActions button{ flex:1; min-width:160px; }
+    .chipRow{
+      display:flex; gap:8px; flex-wrap:wrap; margin-top:10px;
+      font-size:0.74rem; color:var(--muted);
+    }
+    .chip{
+      border:1px solid var(--stroke);
+      padding:4px 8px;
+      border-radius:999px;
+      background:rgba(17,28,51,0.6);
+    }
+
+    .micRow{ display:flex; gap:8px; flex-wrap:wrap; align-items:center; }
+    .micBtn{ display:flex; align-items:center; gap:8px; min-width:220px; }
+    .dot{
+      width:10px; height:10px; border-radius:999px; background:rgba(239,68,68,0.35);
+      box-shadow:0 0 0 rgba(239,68,68,0.0);
+      transition:all .15s ease;
+    }
+    .dot.on{
+      background:rgba(239,68,68,0.95);
+      box-shadow:0 0 18px rgba(239,68,68,0.55);
+    }
+    textarea{
+      width:100%;
+      min-height:170px;
+      resize:vertical;
+      margin-top:10px;
+      border-radius:12px;
+      border:1px solid var(--stroke);
+      background:rgba(11,16,32,0.9);
+      color:var(--text);
+      padding:10px;
+      font-size:0.92rem;
+      line-height:1.25;
+    }
+    .hint{ margin-top:8px; color:var(--muted); font-size:0.76rem; line-height:1.25; }
+    .feedback{
+      margin-top:10px;
+      border-radius:12px;
+      border:1px solid var(--stroke);
+      background:rgba(11,16,32,0.65);
+      padding:10px;
+      font-size:0.9rem;
+      line-height:1.25;
+    }
+    .status{ font-weight:900; letter-spacing:0.3px; }
+    .status.good{ color:var(--good); }
+    .status.warn{ color:var(--warn); }
+    .status.bad{ color:var(--bad); }
+    .smallMono{
+      margin-top:8px;
+      border:1px solid var(--stroke);
+      background:rgba(5,9,20,0.85);
+      border-radius:12px;
+      padding:10px;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+      font-size:0.78rem;
+      color:rgba(229,231,235,0.92);
+      white-space:pre-wrap;
+      line-height:1.25;
+    }
+
+    .footer{
+      display:grid;
+      grid-template-columns: minmax(0,1.4fr) minmax(0,1fr);
+      gap:10px;
+    }
+    @media (max-width:980px){ .footer{ grid-template-columns:1fr; } }
+    ul{ margin:6px 0 0 18px; padding:0; }
+    li{ margin:4px 0; color:var(--muted); font-size:0.78rem; }
+    .badge{
+      display:inline-flex; align-items:center; gap:8px;
+      border:1px solid var(--stroke);
+      background:rgba(17,28,51,0.6);
+      border-radius:999px;
+      padding:4px 10px;
+      color:var(--muted);
+      font-size:0.74rem;
+      font-weight:800;
+      letter-spacing:0.06em;
+      text-transform:uppercase;
+    }
+
+    audio#airportAudio{ display:none; }
+
+    .chip.danger{
+      border-color: rgba(239,68,68,0.45);
+      background: rgba(239,68,68,0.12);
+      color: rgba(239,68,68,0.95);
+      font-weight: 900;
+    }
+
+  
+      .meaningBox{
+        margin-top:12px;
+        padding:10px 12px;
+        border:1px solid rgba(255,255,255,0.12);
+        border-radius:12px;
+        background: rgba(255,255,255,0.04);
+        max-width: 520px;
+      }
+      .meaningTitle{
+        font-size:12px;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+        color: rgba(255,255,255,0.70);
+        margin-bottom:6px;
+      }
+      .meaningText{
+        font-size:13px;
+        color: rgba(255,255,255,0.92);
+        line-height: 1.35;
+        margin-bottom:6px;
+      }
+      .meaningExample{
+        font-size:12px;
+        color: rgba(255,255,255,0.75);
+        line-height: 1.35;
+      }
+
+</style>
+</head>
+<body>
+  <div class="app">
+    <div class="topbar">
+      <div>
+        <div class="title">US Passport Control Interview Trainer - v1 (Desktop)</div>
+        <div class="subtitle">
+          Официальная тренировка вопросов CBP. Сначала слушай. Отвечай коротко. Без лишней информации.
+          Works best in Chrome (Speech Recognition support varies by browser).
+        </div>
+      </div>
+      <div class="controls">
+        <label class="control">
+          Level
+          <select id="levelSelect">
+            <option value="A1">A1 - Basic entry</option>
+            <option value="A2">A2 - Realistic follow-ups</option>
+            <option value="B1">B1 - Stress mode</option>
+          </select>
+        </label>
+        <label class="control">
+          Traveler type
+          <select id="personaSelect">
+            <option value="tourist" selected>Tourism / Visit (B1/B2, ESTA)</option>
+            <option value="student">Study (F-1 / M-1)</option>
+            <option value="work">Work visas (H-1B / O-1 / L-1)</option>
+            <option value="immigrant">Immigration (Green Card / DV Lottery)</option>
+          </select>
+        </label>
+
+        <label class="control">
+          Officer style
+          <select id="styleSelect">
+            <option value="calm">Calm</option>
+            <option value="strict" selected>Strict</option>
+            <option value="fast">Fast</option>
+          </select>
+        </label>
+        <label class="control">
+          Speed
+          <select id="speedSelect">
+            <option value="0.85">Slow</option>
+            <option value="1.0" selected>Normal</option>
+            <option value="1.15">Fast</option>
+          </select>
+        </label>
+        <label class="control">
+          <input type="checkbox" id="showTranscript" />
+          Show transcript
+        </label>
+        <button id="toggleNoiseBtn" class="secondary">Airport noise: Off</button>
+      </div>
+    </div>
+
+    <div class="layout">
+      <div class="panel">
+        <h2>Officer</h2>
+        <div class="officerRow">
+          <div class="avatar" id="avatar">
+  <img id="officerImg" src="https://api.dicebear.com/8.x/personas/svg?seed=359469"
+       alt="CBP Officer" style="width:100%;height:100%;object-fit:cover;border-radius:14px;">
+</div>
+          <div class="officerMeta">
+            <div class="metaLine" id="officerTitle">CBP Officer - JFK Airport</div>
+            <div class="metaSub" id="officerSub">Style: Strict • Voice: en-US</div>
+            <div class="metaSub" id="scenarioTag">Scenario: Tourist / Visitor</div>
+          </div>
+        </div>
+
+        <div class="hint" style="margin-top:10px">
+          Officer behavior can feel cold. Your goal: answer the question only, in one sentence where possible.
+        </div>
+
+        <div class="smallMono" id="quickRules">Правила:
+- Отвечай только на то, что спросили.
+- Коротко: 1–2 предложения.
+- Не добавляй лишние планы (работа, «возможности», переезд).
+- Называй чёткие даты и места.</div>
+      </div>
+
+      <div class="panel">
+        <h2>Question</h2>
+        <div class="bubble" id="questionBubble">
+          <div id="questionText">Press "Next question" to start.</div>
+          <small id="questionHint">First listen. Then read (optional).</small>
+        </div>
+
+        <div class="meaningBox" id="meaningBox" aria-live="polite">
+          <div class="meaningTitle">Meaning (RU)</div>
+          <div class="meaningText" id="meaningText">Нажми “Next question”. Здесь появится краткий смысл вопроса и как отвечать.</div>
+          <div class="meaningExample" id="meaningExample">Example: —</div>
+        </div>
+
+        <div class="qActions">
+          <button id="repeatBtn" class="secondary" disabled>Repeat question</button>
+          <button id="nextBtn" class="primary">Next question</button>
+        </div>
+
+        <div class="chipRow">
+          <span class="chip" id="chipLevel">Level: A1</span>
+          <span class="chip" id="chipTopic">Topic: Basics</span>
+          <span class="chip" id="chipRisk">Risk: Low</span>
+          <span class="chip" id="chipPersona">Traveler: Tourist</span>
+          <span class="chip" id="chipTimer">Timer: Off</span>
+          <span class="chip" id="chipRepeats">Repeats: ∞</span>
+        </div>
+
+        <div class="hint">
+          Tip: hide transcript and rely on listening. Repeat up to 2-3 times. Then answer.
+        </div>
+        <div class="smallMono" id="officerPhraseBox" style="margin-top:10px;display:none;"></div>
+      </div>
+
+      <div class="panel">
+        <h2>Your answer</h2>
+
+        <div class="micRow">
+          <button id="micBtn" class="primary micBtn">
+            <span class="dot" id="micDot"></span>
+            <span id="micLabel">Start microphone</span>
+          </button>
+          <button id="submitBtn" class="secondary" disabled>Submit answer</button>
+          <button id="clearBtn" class="danger">Clear</button>
+        </div>
+
+        <textarea id="answerBox" placeholder="Your spoken answer will appear here (if Speech Recognition is supported). You can also type."></textarea>
+
+        <div class="feedback" id="feedbackBox">
+          <span class="status" id="statusLabel">Waiting.</span>
+          <div id="statusText" style="margin-top:6px;color:var(--muted);font-size:0.82rem;">
+            Press "Next question", listen, then answer.
+          </div>
+        </div>
+
+        <div class="smallMono" id="modelAnswerBox" style="display:none;"></div>
+
+        <div class="hint">
+          Microphone uses your browser's Speech Recognition (Chrome recommended). If unsupported, type your answer and submit.
+        </div>
+      </div>
+    </div>
+
+    <div class="footer">
+      <div class="panel">
+        <h2>План тренировок</h2>
+        <span class="badge">ежедневная тренировка</span>
+        <ul>
+          <li>Начни с A1. Цель: 30 чистых ответов без лишней информации.</li>
+          <li>Переходи на A2. Тренируй уточняющие вопросы (где будешь жить, обратный билет, деньги).</li>
+          <li>B1 — стресс-режим: строгий офицер, меньше времени, больше подозрительных уточнений.</li>
+        </ul>
+      </div>
+      
+
+  <audio id="airportAudio" src="airport_ambience.mp3" loop></audio>
+
+  <script>
+    const questions = {
+      A1: [
+        {
+          text: "What is the purpose of your visit?",
+          topic: "Basics",
+          risk: "Low",
+          scenarioTag: "Tourist / Visitor",
+          modelAnswer: "I'm here for tourism, and I'll stay for two weeks.",
+          keywords: ["tourism","vacation","visit","two weeks","2 weeks"],
+          riskyPhrases: ["work","job","opportunity","move","relocate","stay forever"]
+        },
+        {
+          text: "How long will you stay in the United States?",
+          topic: "Duration",
+          risk: "Low",
+          scenarioTag: "Tourist / Visitor",
+          modelAnswer: "I'll stay for two weeks.",
+          keywords: ["two weeks","2 weeks","14 days","two week"],
+          riskyPhrases: ["months","forever","not sure","until i find"]
+        },
+        {
+          text: "Where will you stay?",
+          topic: "Address",
+          risk: "Medium",
+          scenarioTag: "Hotel / Family",
+          modelAnswer: "I'll stay at a hotel in Queens, New York.",
+          keywords: ["hotel","queens","new york","nyc","address"],
+          riskyPhrases: ["i will figure it out","i don't know","with random people"]
+        },
+        {
+          text: "Is this your first time in the US?",
+          topic: "History",
+          risk: "Low",
+          scenarioTag: "Entry history",
+          modelAnswer: "Yes, it's my first time.",
+          keywords: ["yes","first time","no","been here"],
+          riskyPhrases: []
+        }
+      ],
+      A2: [
+        {
+          text: "Who are you visiting, and where will you stay?",
+          topic: "Visitor + address",
+          risk: "Medium",
+          scenarioTag: "Visiting family / friends",
+          modelAnswer: "I'm visiting a friend, and I'll stay at their apartment in Queens, New York.",
+          keywords: ["visiting","friend","family","stay","queens","apartment","address"],
+          riskyPhrases: ["i met online","i don't know them","maybe work"]
+        },
+        {
+          text: "Do you have a return ticket? When is your flight back?",
+          topic: "Return ticket",
+          risk: "Medium",
+          scenarioTag: "Tourist / Visitor",
+          modelAnswer: "Yes. My return flight is on January 10.",
+          keywords: ["return","flight","back","date","ticket","january","feb","march","april","may","june","july","aug","sep","oct","nov","dec"],
+          riskyPhrases: ["one-way","not sure","open ticket","later"]
+        },
+        {
+          text: "How much money are you bringing, and who is paying for the trip?",
+          topic: "Funds",
+          risk: "Medium",
+          scenarioTag: "Financials",
+          modelAnswer: "I have about two thousand dollars, and I'm paying for the trip myself.",
+          keywords: ["dollars","$","paying","myself","credit card","cash","two thousand","2000"],
+          riskyPhrases: ["i will borrow","i will earn there","i will find a job"]
+        },
+        {
+          text: "What do you do for work in your country?",
+          topic: "Occupation",
+          risk: "Medium",
+          scenarioTag: "Background",
+          modelAnswer: "I study and create content in Kazakhstan.",
+          keywords: ["work","student","content","kazakhstan","study"],
+          riskyPhrases: ["i want to work in the us","i will look for work"]
+        }
+      ],
+      B1: [
+        {
+          text: "Why did you choose the United States for this trip?",
+          topic: "Motivation",
+          risk: "High",
+          scenarioTag: "Stress follow-up",
+          modelAnswer: "I'm here for a short tourist visit to New York, and I will return on my scheduled date.",
+          keywords: ["short","tourist","visit","new york","return","scheduled","date"],
+          riskyPhrases: ["opportunities","future","move","stay longer","network for work"]
+        },
+        {
+          text: "Are you planning to work in the United States?",
+          topic: "Work intent",
+          risk: "High",
+          scenarioTag: "Strict screening",
+          modelAnswer: "No. I am not planning to work. I'm here only for tourism.",
+          keywords: ["no","not","work","tourism","only"],
+          riskyPhrases: ["maybe","if i can","just a little","cash job","gig"]
+        },
+        {
+          text: "You travel often? What was your last trip, and why?",
+          topic: "Travel history",
+          risk: "Medium",
+          scenarioTag: "Suspicious style",
+          modelAnswer: "My last trip was a short visit, and I returned on time.",
+          keywords: ["last trip","short","visit","returned","on time"],
+          riskyPhrases: ["i overstayed","i stayed longer","not sure"]
+        },
+        {
+          text: "What exactly will you do during your stay in New York?",
+          topic: "Itinerary",
+          risk: "High",
+          scenarioTag: "Details",
+          modelAnswer: "I'll do tourism, visit landmarks, and then I will fly back.",
+          keywords: ["tourism","landmarks","visit","fly back","return"],
+          riskyPhrases: ["meet employers","audition for jobs","find opportunities","look for work"]
+        }
+      ]
+    };
+
+    let current = null;
+    let awaitingNext = false;
+    let lastQuestionText = "";
+    let noiseOn = false;
+    let recognizing = false;
+
+    // Mode mechanics
+    let repeatsUsed = 0;
+    let repeatLimit = Infinity;
+    let timerSeconds = 0;
+    let timerInterval = null;
+    let timeLeft = 0;
+
+    // Follow-up engine (strict)
+    let pendingFollowUp = null;
+
+
+    const levelSelect = document.getElementById("levelSelect");
+    const styleSelect = document.getElementById("styleSelect");
+    const personaSelect = document.getElementById("personaSelect") || { value: "tourist", addEventListener: () => {} };
+    const speedSelect = document.getElementById("speedSelect");
+    const showTranscript = document.getElementById("showTranscript");
+
+    const questionBubble = document.getElementById("questionBubble");
+    const questionText = document.getElementById("questionText");
+    const questionHint = document.getElementById("questionHint");
+    const repeatBtn = document.getElementById("repeatBtn");
+    const nextBtn = document.getElementById("nextBtn");
+
+    const chipLevel = document.getElementById("chipLevel");
+    const chipTopic = document.getElementById("chipTopic");
+    const chipRisk = document.getElementById("chipRisk");
+    const meaningBox = document.getElementById("meaningBox");
+    const meaningText = document.getElementById("meaningText");
+    const meaningExample = document.getElementById("meaningExample");
+    const chipPersona = document.getElementById("chipPersona");
+    const chipTimer = document.getElementById("chipTimer");
+    const chipRepeats = document.getElementById("chipRepeats");
+    const officerPhraseBox = document.getElementById("officerPhraseBox");
+
+
+    const officerSub = document.getElementById("officerSub");
+    const scenarioTag = document.getElementById("scenarioTag");
+
+    const micBtn = document.getElementById("micBtn");
+    const micDot = document.getElementById("micDot");
+    const micLabel = document.getElementById("micLabel");
+    const submitBtn = document.getElementById("submitBtn");
+    const clearBtn = document.getElementById("clearBtn");
+    const answerBox = document.getElementById("answerBox");
+
+    const statusLabel = document.getElementById("statusLabel");
+    const statusText = document.getElementById("statusText");
+    const modelAnswerBox = document.getElementById("modelAnswerBox");
+
+    const airportAudio = document.getElementById("airportAudio");
+    const toggleNoiseBtn = document.getElementById("toggleNoiseBtn");
+
+    
+    function getMode(){ return styleSelect.value; } // calm | strict | fast
+
+    function getWordLimit(level, mode){
+      if (mode === "calm"){
+        if (level === "A1") return 26;
+        if (level === "A2") return 30;
+        return 34;
+      }
+      if (mode === "strict"){
+        if (level === "A1") return 14;
+        if (level === "A2") return 18;
+        return 22;
+      }
+      // fast
+      if (level === "A1") return 18;
+      if (level === "A2") return 20;
+      return 24;
+    }
+
+    function getRepeatLimit(mode){
+      if (mode === "calm") return Infinity;
+      if (mode === "strict") return 2;
+      return 1; // fast
+    }
+
+    function getTimerSeconds(level, mode){
+      if (mode !== "fast") return 0;
+      if (level === "A1") return 15;
+      if (level === "A2") return 12;
+      return 10;
+    }
+
+    function setOfficerPhrase(text, mode){
+      if (!text){
+        officerPhraseBox.style.display = "none";
+        officerPhraseBox.textContent = "";
+        return;
+      }
+      officerPhraseBox.style.display = "block";
+      officerPhraseBox.textContent = "Officer: " + text;
+    }
+
+    function pickOfficerPhrase(kind, mode){
+      const calm = {
+        ok: ["Okay.", "Alright.", "Thank you.", "Next question."],
+        warn: ["Please be more specific.", "Try again, but keep it short.", "Add one detail."],
+        bad: ["Let's try again.", "Please answer the question."]
+      };
+      const strict = {
+        ok: ["Next.", "Okay. Next.", "Fine. Next question."],
+        warn: ["Be specific.", "Where exactly?", "How long exactly?", "Just answer the question."],
+        bad: ["That's not what I asked.", "Answer the question.", "Do you have proof?", "Where exactly?"]
+      };
+      const fast = {
+        ok: ["Next.", "Good. Next.", "Next question."],
+        warn: ["Shorter.", "Quick.", "Answer."],
+        bad: ["Answer.", "Next.", "Quick."]
+      };
+
+      const bank = (mode === "calm") ? calm : (mode === "strict" ? strict : fast);
+      const arr = bank[kind] || bank.ok;
+      return arr[Math.floor(Math.random() * arr.length)];
+    }
+
+    function stopTimer(){
+      if (timerInterval){
+        clearInterval(timerInterval);
+        timerInterval = null;
+      }
+      timeLeft = 0;
+      chipTimer.classList.remove("danger");
+    }
+
+    function startTimer(){
+      stopTimer();
+      if (!timerSeconds){
+        chipTimer.textContent = "Timer: Off";
+        return;
+      }
+      timeLeft = timerSeconds;
+      chipTimer.textContent = "Timer: " + timeLeft + "s";
+      timerInterval = setInterval(() => {
+        timeLeft -= 1;
+        chipTimer.textContent = "Timer: " + timeLeft + "s";
+        if (timeLeft <= 5) chipTimer.classList.add("danger");
+        if (timeLeft <= 0){
+          stopTimer();
+          // time out behavior
+          setOfficerPhrase(pickOfficerPhrase("bad", "fast"), "fast");
+          setStatus("Too slow.", "Time is up. In FAST mode you must answer immediately.", "bad");
+          showModelAnswer();
+          // Auto-next after short delay
+          setTimeout(() => nextQuestion(), 900);
+        }
+      }, 1000);
+    }
+
+    function updateModeRulesUI(){
+      const mode = getMode();
+      const level = levelSelect.value;
+      repeatLimit = getRepeatLimit(mode);
+      timerSeconds = getTimerSeconds(level, mode);
+
+      if (repeatLimit === Infinity) chipRepeats.textContent = "Repeats: ∞";
+      else chipRepeats.textContent = "Repeats: " + (repeatLimit - repeatsUsed) + " left";
+
+      if (timerSeconds) chipTimer.textContent = "Timer: " + timerSeconds + "s";
+      else chipTimer.textContent = "Timer: Off";
+    }
+
+    function getFollowUpsFor(question){
+      // Basic follow-up sets based on typical CBP behavior
+      return [
+        "Where exactly will you stay?",
+        "Who is paying for this trip?",
+        "Do you have a return ticket?",
+        "How much money do you have with you?",
+        "Are you planning to work in the United States?"
+      ];
+    }
+
+    function chooseFollowUp(reason){
+      const list = getFollowUpsFor(current);
+      // small bias based on reason
+      if (reason === "work") return "So you are planning to work in the US?";
+      if (reason === "unknown") return "You don't know your return date?";
+      if (reason === "address") return "Where exactly will you stay?";
+      return list[Math.floor(Math.random() * list.length)];
+    }
+
+    function speak(text){
+      if (!("speechSynthesis" in window)) return;
+      const utter = new SpeechSynthesisUtterance(text);
+      utter.lang = "en-US";
+      const baseRate = parseFloat(speedSelect.value) || 1.0;
+      const style = styleSelect.value; // calm | strict | fast
+
+      let styleMult = 1.0;
+      if (style === "calm") styleMult = 0.92;
+      if (style === "strict") styleMult = 1.00;
+      if (style === "fast") styleMult = 1.12;
+
+      utter.rate = baseRate * styleMult;
+      window.speechSynthesis.cancel();
+      window.speechSynthesis.speak(utter);
+    }
+
+    function updateOfficerMeta(){
+      const style = styleSelect.value; // calm | strict | fast
+      const styleLabel = style.charAt(0).toUpperCase() + style.slice(1);
+      officerSub.textContent = `Style: ${styleLabel} • Voice: en-US`;
+    }
+
+    
+    // --- Question banks by traveler type and level ---
+    // Keep answers short and specific. Avoid wording that implies unauthorized work/relocation.
+    
+    const QUESTION_BANKS = {
+      tourist: {
+        A1: [
+          q("What is the purpose of your visit?","Purpose","Low","B1/B2","Tourism. I'm visiting for one week.","tourism,visit,one week","work,job,opportunity,move,relocate,stay forever"),
+          q("How long will you stay in the United States?","Duration","Low","B1/B2","Seven days.","seven,days,week","work,move,relocate"),
+          q("Where will you be staying?","Lodging","Low","B1/B2","At a hotel in Manhattan.","hotel,manhattan,new york","work,move"),
+          q("What city are you visiting?","Location","Low","B1/B2","New York City.","new york,nyc","work"),
+          q("Are you traveling alone?","Companions","Low","B1/B2","Yes, I'm traveling alone.","yes,alone","work"),
+          q("Do you have a return ticket?","Return","Low","B1/B2","Yes, my return flight is next Friday.","return,flight,next","one-way,stay forever"),
+          q("Have you visited the U.S. before?","History","Low","B1/B2","No, this is my first time.","first time,no","overstay,work"),
+          q("What do you do for a living?","Occupation","Low","B1/B2","I'm a student in Kazakhstan.","student,kazakhstan","work in us"),
+          q("Who is paying for your trip?","Funds","Medium","B1/B2","I am paying for my trip.","i am,paying","sponsor i met online"),
+          q("How much money are you carrying?","Funds","Medium","B1/B2","About 800 dollars.","800,dollars,money","no money"),
+          q("Do you have a hotel reservation?","Docs","Low","B1/B2","Yes.","reservation,hotel","no plan"),
+          q("Are you visiting friends or family?","Contacts","Medium","B1/B2","No, I'm traveling alone.","no,alone","moving in"),
+          q("Are you carrying food, plants, or animal products?","Customs","High","B1/B2","No.","no","food,plants,meat"),
+          q("Do you have anything to declare?","Customs","High","B1/B2","No, nothing to declare.","nothing,declare",""),
+          q("When do you fly back?","Return","Low","B1/B2","I fly back on March 1st.","fly back,date","not sure")
+        ],
+        A2: [
+          q("What places will you visit during your stay?","Itinerary","Low","B1/B2","Manhattan and Queens. Mostly museums.","museums,manhattan,queens","work"),
+          q("What is the address of your hotel?","Lodging","Medium","B1/B2","123 Example Street, New York.","address,street,new york","not sure"),
+          q("How are you funding your trip?","Funds","Medium","B1/B2","Savings and my card.","savings,card","work here"),
+          q("Do you plan to study in the U.S.?","Intent","High","B1/B2","No, only tourism.","no,only,tourism","study"),
+          q("Do you plan to work in the U.S.?","Intent","High","B1/B2","No.","no","work"),
+          q("How long is your hotel booked for?","Lodging","Medium","B1/B2","For seven nights.","seven,nights","not sure"),
+          q("Who do you know in the U.S.?","Contacts","Medium","B1/B2","I don't know anyone here.","don't know","friends will find work"),
+          q("Do you have travel insurance?","Docs","Low","B1/B2","Yes.","yes,insurance",""),
+          q("How much cash do you have today?","Funds","Medium","B1/B2","About 200 dollars in cash.","200,dollars,cash","no money"),
+          q("What will you do after your trip?","Ties","Medium","B1/B2","Return home and continue my work.","return,home,work","move"),
+          q("Are you bringing gifts?","Customs","Low","B1/B2","Small souvenirs.","souvenirs,small","commercial goods"),
+          q("Are you here for shopping?","Purpose","Low","B1/B2","Yes, shopping and sightseeing.","shopping,sightseeing","work"),
+          q("Are you here for medical treatment?","Purpose","Medium","B1/B2","No.","no",""),
+          q("Are you attending a conference?","Purpose","Medium","B1/B2","No.","no","work"),
+          q("Do you have proof of funds?","Funds","High","B1/B2","Yes.","yes,proof,funds","no")
+        ],
+        B1: [
+          q("Are you planning to extend your stay?","Intent","High","B1/B2","No, I will leave on my return ticket.","no,return ticket","extend,stay longer"),
+          q("Have you ever overstayed a visa?","Compliance","High","B1/B2","No.","no","overstay"),
+          q("Show your return ticket and hotel booking.","Docs","High","B1/B2","Yes, here they are.","return,hotel,booking","no"),
+          q("Why did you choose this city?","Intent","Medium","B1/B2","For tourism and famous places.","tourism,famous","work"),
+          q("What is your full itinerary?","Itinerary","High","B1/B2","New York for seven days, then back home.","new york,seven,back","not sure"),
+          q("Are you carrying more than $10,000?","Customs","High","B1/B2","No.","no",""),
+          q("Are you bringing any items for sale?","Customs","High","B1/B2","No, only personal items.","personal,items","sale"),
+          q("Who is paying for your trip?","Funds","High","B1/B2","I am paying, and I can show my bank balance.","paying,bank,balance","no money"),
+          q("What is your job and employer back home?","Ties","High","B1/B2","I'm a student and content creator.","student,creator","work here"),
+          q("Do you intend to seek work or study while in the U.S.?","Intent","High","B1/B2","No.","no","work,study"),
+          q("Where exactly will you stay?","Lodging","High","B1/B2","At my hotel in Manhattan.","hotel,manhattan","not sure"),
+          q("How long exactly will you stay?","Duration","High","B1/B2","Seven days.","seven,days","months"),
+          q("Do you have anything to declare?","Customs","High","B1/B2","No.","no",""),
+          q("Are you carrying food or plants?","Customs","High","B1/B2","No.","no","food,plants"),
+          q("What will you do when you return home?","Ties","High","B1/B2","Continue my studies/work.","continue,studies,work","move")
+        ]
+      },
+
+      student: {
+        A1: [
+          q("What is the purpose of your visit?","Purpose","Low","F-1/M-1","I am entering to study.","study,student,f-1","work,job,move forever"),
+          q("Which school will you attend?","School","Low","F-1/M-1","Queens College.","queens,college","not sure"),
+          q("What is your major?","School","Low","F-1/M-1","Music production.","music,production,major",""),
+          q("Do you have your Form I-20?","Documents","Low","F-1/M-1","Yes, here is my I-20.","i-20,yes","no"),
+          q("Have you paid the I-901 SEVIS fee?","SEVIS","Medium","F-1/M-1","Yes, I paid it and have the receipt.","paid,sevis,receipt","no"),
+          q("When does your school start?","Dates","Low","F-1/M-1","It starts on August 20th.","starts,august","not sure"),
+          q("Where will you live in the U.S.?","Housing","Low","F-1/M-1","In the campus dorms.","dorm,campus","not sure"),
+          q("Who is paying for your studies?","Funds","Medium","F-1/M-1","My family is paying.","family,paying","work to pay"),
+          q("What is your SEVIS ID?","SEVIS","Medium","F-1/M-1","It is on my I-20.","sevis,i-20","not sure"),
+          q("Do you have your admission letter?","Documents","Low","F-1/M-1","Yes.","admission,letter","no"),
+          q("Have you been to the U.S. before?","History","Low","F-1/M-1","No, this is my first time.","first,time","overstay"),
+          q("What is your U.S. address?","Housing","Medium","F-1/M-1","The dorm address on my I-20.","address,i-20","not sure"),
+          q("How long is your program?","Program","Medium","F-1/M-1","Two years.","two,years","not sure"),
+          q("Do you understand F-1 work limits?","Compliance","High","F-1/M-1","Yes. Only authorized work.","authorized,only","work off-campus"),
+          q("What will you do after graduation?","Intent","High","F-1/M-1","Return home after studies.","return,home","stay permanently")
+        ],
+        A2: [
+          q("How will you pay tuition?","Funds","High","F-1/M-1","My family funds it. I have proof.","family,proof,funds","work to pay"),
+          q("Do you have proof of financial support?","Funds","High","F-1/M-1","Yes, bank statements.","bank,statements","no"),
+          q("Where will you stay tonight?","Housing","Medium","F-1/M-1","At the dorm address on my I-20.","dorm,address,i-20","not sure"),
+          q("What classes will you take?","Program","Medium","F-1/M-1","Music production courses.","courses,music,production",""),
+          q("Are you planning to work in the U.S.?","Intent","High","F-1/M-1","Only if authorized under F-1 rules.","authorized,f-1","illegal work"),
+          q("Who is your DSO?","School","Medium","F-1/M-1","I can provide the school contact.","school,contact","not sure"),
+          q("Do you have a class schedule?","Program","Medium","F-1/M-1","Yes, I can show it.","show,schedule","no"),
+          q("Do you have health insurance?","Docs","Low","F-1/M-1","Yes.","insurance,yes",""),
+          q("Did you pay any tuition deposit?","Funds","Medium","F-1/M-1","Yes, I have confirmation.","paid,confirmation","no"),
+          q("How did you choose this school?","Intent","Medium","F-1/M-1","For the program and reputation.","program,reputation",""),
+          q("What is your plan after graduation?","Intent","High","F-1/M-1","Return home.","return,home","stay"),
+          q("Are you bringing dependents?","Basics","Low","F-1/M-1","No.","no",""),
+          q("Do you have your SEVIS receipt?","SEVIS","Medium","F-1/M-1","Yes, here it is.","receipt,here","no"),
+          q("What is your home country?","Basics","Low","F-1/M-1","Kazakhstan.","kazakhstan",""),
+          q("Who is meeting you at the airport?","Arrival","Low","F-1/M-1","No one. I will go to the dorm.","no one,dorm","")
+        ],
+        B1: [
+          q("Show your I-20 and financial documents.","Docs","High","F-1/M-1","Yes, here they are.","i-20,financial,documents","no"),
+          q("How will you support yourself in the U.S.?","Funds","High","F-1/M-1","Family support and savings. I have proof.","family,savings,proof","work illegally"),
+          q("What is your full U.S. address?","Housing","High","F-1/M-1","The dorm address on my I-20.","address,i-20","not sure"),
+          q("Do you intend to work off campus?","Compliance","High","F-1/M-1","No.","no","yes"),
+          q("Did you pay the I-901 SEVIS fee?","SEVIS","High","F-1/M-1","Yes, and I have the receipt.","paid,sevis,receipt","no"),
+          q("Do you understand F-1 work limits?","Compliance","High","F-1/M-1","Yes. Only authorized work.","authorized,only","illegal work"),
+          q("Why are you entering now?","Intent","Medium","F-1/M-1","To start my program.","start,program",""),
+          q("What is your program start date?","Dates","Medium","F-1/M-1","August 20th.","august,20","not sure"),
+          q("Do you plan to transfer schools?","Intent","Medium","F-1/M-1","No.","no","maybe"),
+          q("Are you carrying any restricted items/food?","Customs","High","F-1/M-1","No.","no",""),
+          q("Do you have relatives in the U.S.?","Contacts","High","F-1/M-1","No.","no",""),
+          q("What will you do during breaks?","Intent","Medium","F-1/M-1","Stay as a student or travel briefly.","student,breaks","work"),
+          q("Where will you live after the dorm?","Housing","High","F-1/M-1","I will follow school housing options.","school,housing","not sure"),
+          q("Do you have your school contact info?","Docs","Low","F-1/M-1","Yes.","yes",""),
+          q("Are you bringing any commercial goods?","Customs","High","F-1/M-1","No.","no","sale")
+        ]
+      },
+
+      work: {
+        A1: [
+          q("What is the purpose of your entry today?","Purpose","Low","Work visa","I am entering to work.","work,entering","tourism,visit"),
+          q("What type of work visa do you have?","Status","Medium","Work visa","H-1B.","h-1b,visa","not sure"),
+          q("Who is your employer in the United States?","Employer","High","Work visa","ABC Tech Inc.","employer,company","not sure"),
+          q("What is your job title?","Employer","Medium","Work visa","Software engineer.","job,title,engineer","not sure"),
+          q("Where will you work?","Employer","Medium","Work visa","In New York City.","work,new york","not sure"),
+          q("Do you have your approval notice?","Documents","High","Work visa","Yes, I have my approval notice.","approval,notice","no"),
+          q("Where will you live?","Housing","Low","Work visa","In Queens, New York.","queens,new york","not sure"),
+          q("How long is your work authorized for?","Status","Medium","Work visa","For the period on my approval.","period,approval","not sure"),
+          q("Are you entering to start a new job?","Purpose","Medium","Work visa","Yes.","yes","no"),
+          q("Do you have a U.S. address?","Housing","Medium","Work visa","Yes.","yes,address","not sure"),
+          q("What city are you moving to?","Basics","Low","Work visa","New York City.","new york","not sure"),
+          q("Have you worked in the U.S. before?","History","Low","Work visa","No.","no",""),
+          q("What visa category is this?","Status","Medium","Work visa","O-1.","o-1","not sure"),
+          q("Are you transferring within the same company?","Purpose","Medium","Work visa","Yes, L-1 transfer.","l-1,transfer","not sure"),
+          q("When does your job start?","Dates","Low","Work visa","Next Monday.","start,next monday","not sure")
+        ],
+        A2: [
+          q("What is your employer's address?","Employer","High","Work visa","123 Example Ave, New York.","address,new york","not sure"),
+          q("What is your salary?","Employer","High","Work visa","It is in my offer letter.","salary,offer letter","not sure"),
+          q("Do you have your offer letter?","Documents","High","Work visa","Yes.","offer,letter","no"),
+          q("What is your start date?","Dates","Medium","Work visa","March 1st.","march,1st","not sure"),
+          q("What will you do in your job?","Employer","Medium","Work visa","Software development.","software,development","not sure"),
+          q("Are you working for the petitioning employer?","Compliance","High","Work visa","Yes.","yes,petitioning","no"),
+          q("Are you bringing family members?","Basics","Medium","Work visa","No.","no",""),
+          q("Do you have a return ticket?","Travel","Low","Work visa","No, I'm entering for employment.","employment,entering","tourism"),
+          q("Where did you apply for your visa?","History","Low","Work visa","At the U.S. Embassy in Almaty.","embassy,almaty","not sure"),
+          q("What is your visa expiration date?","Status","Medium","Work visa","It is on my visa stamp.","expiration,stamp","not sure"),
+          q("Who will you live with?","Housing","Low","Work visa","I will live alone.","alone","not sure"),
+          q("Do you have health insurance?","Docs","Low","Work visa","Yes.","insurance,yes",""),
+          q("What is your highest degree?","Background","Medium","Work visa","Bachelor's degree.","bachelor,degree","not sure"),
+          q("What is your company doing?","Employer","Medium","Work visa","Technology services.","technology,services","not sure"),
+          q("Have you ever been refused a U.S. visa?","History","High","Work visa","No.","no","yes")
+        ],
+        B1: [
+          q("Show your approval notice and offer letter.","Docs","High","Work visa","Yes, here they are.","approval,offer,letter","no"),
+          q("Are you entering on H-1B/O-1/L-1 today?","Status","High","Work visa","Yes.","yes","no"),
+          q("Who is your petitioner and what is the job?","Employer","High","Work visa","ABC Tech, software engineer.","abc,software,engineer","not sure"),
+          q("Where will you work and live?","Housing","High","Work visa","Work in NYC, live in Queens.","work,nyc,queens","not sure"),
+          q("Do you understand you must work only for the authorized employer?","Compliance","High","Work visa","Yes.","yes,only,authorized","no"),
+          q("Are you bringing any restricted items?","Customs","High","Work visa","No.","no",""),
+          q("Do you have anything to declare?","Customs","High","Work visa","No.","no",""),
+          q("Have you ever overstayed in the U.S.?","Compliance","High","Work visa","No.","no","overstay"),
+          q("Have you ever been arrested or convicted?","Compliance","High","Work visa","No.","no","yes"),
+          q("What is your exact start date?","Dates","High","Work visa","March 1st.","march,1st","not sure"),
+          q("What is your work location address?","Employer","High","Work visa","123 Example Ave, New York.","address,new york","not sure"),
+          q("What is your visa class?","Status","Medium","Work visa","H-1B.","h-1b","not sure"),
+          q("What will you do if this job ends?","Intent","High","Work visa","Follow U.S. immigration rules.","rules","overstay"),
+          q("Are you entering with dependents?","Basics","Medium","Work visa","No.","no",""),
+          q("Do you have your employer contact info?","Docs","Medium","Work visa","Yes.","contact,info","no")
+        ]
+      },
+
+      immigrant: {
+        A1: [
+          q("What is the purpose of your entry today?","Purpose","Low","Immigrant","I am immigrating to the United States.","immigrating,permanent","tourism,visit"),
+          q("Are you entering as a permanent resident?","Status","Medium","Immigrant","Yes.","yes,permanent resident","no"),
+          q("Do you have your immigrant visa packet?","Documents","High","Immigrant","Yes.","visa,packet","no"),
+          q("What is your U.S. address for the green card?","Address","High","Immigrant","123 Example Street, New York.","address,new york","not sure"),
+          q("Who is sponsoring you?","Sponsor","High","Immigrant","My spouse.","spouse,sponsor","not sure"),
+          q("What is your relationship to the sponsor?","Sponsor","High","Immigrant","My husband/wife.","husband,wife,spouse","not sure"),
+          q("Are you entering through the DV Lottery?","Program","Medium","Immigrant","Yes.","dv,lottery","no"),
+          q("What city will you live in?","Residence","Low","Immigrant","New York City.","new york","not sure"),
+          q("Are you bringing your family?","Basics","Medium","Immigrant","No.","no",""),
+          q("Do you have proof of your relationship?","Documents","High","Immigrant","Yes.","proof,relationship","no"),
+          q("Do you have your medical exam?","Documents","Medium","Immigrant","Yes.","medical,exam","no"),
+          q("Have you paid the USCIS immigrant fee?","Documents","Medium","Immigrant","Yes.","uscis,fee,paid","no"),
+          q("Do you have a sealed envelope?","Documents","High","Immigrant","Yes.","sealed,envelope","no"),
+          q("What is your final destination?","Residence","Low","Immigrant","New York.","new york","not sure"),
+          q("Do you have your police certificate?","Documents","Medium","Immigrant","Yes.","police,certificate","no")
+        ],
+        A2: [
+          q("What is your exact U.S. address?","Address","High","Immigrant","123 Example Street, Queens, NY.","address,queens,ny","not sure"),
+          q("Who is picking you up today?","Arrival","Low","Immigrant","My spouse.","spouse,pick up","not sure"),
+          q("What is your sponsor's address?","Sponsor","High","Immigrant","Same as my U.S. address.","same,address","not sure"),
+          q("What is your sponsor's full name?","Sponsor","High","Immigrant","John Smith.","john,smith","not sure"),
+          q("Do you have proof of funds/support?","Funds","High","Immigrant","Yes.","proof,support","no"),
+          q("What is your plan for work after you arrive?","Intent","High","Immigrant","I will follow the rules and work after authorization.","authorization,rules","illegal work"),
+          q("Have you ever been refused a U.S. visa?","History","High","Immigrant","No.","no","yes"),
+          q("Have you ever been deported from any country?","Compliance","High","Immigrant","No.","no","yes"),
+          q("Do you have any criminal history?","Compliance","High","Immigrant","No.","no","yes"),
+          q("What is your marital status?","Basics","Medium","Immigrant","Married.","married","not sure"),
+          q("When did you get married?","Sponsor","High","Immigrant","In 2024.","married,2024","not sure"),
+          q("How did you meet your spouse?","Sponsor","High","Immigrant","Online and then in person.","online,met","fraud"),
+          q("What is your sponsor's job?","Sponsor","Medium","Immigrant","He works in IT.","works,it","not sure"),
+          q("Have you been to the U.S. before?","History","Medium","Immigrant","Yes, as a visitor.","visitor,before","overstay"),
+          q("Do you have your DS-260 confirmation?","Documents","Medium","Immigrant","Yes.","ds-260,confirmation","no")
+        ],
+        B1: [
+          q("Show your immigrant visa packet and documents.","Docs","High","Immigrant","Yes, here they are.","packet,documents","no"),
+          q("Confirm your U.S. address for green card delivery.","Address","High","Immigrant","123 Example Street, Queens, NY.","address,queens,ny","not sure"),
+          q("Who is your sponsor and what is the relationship?","Sponsor","High","Immigrant","My spouse.","spouse,relationship","not sure"),
+          q("Are you entering as a DV Lottery immigrant?","Program","High","Immigrant","Yes.","dv,lottery","no"),
+          q("Do you understand your resident obligations?","Compliance","High","Immigrant","Yes.","understand,obligations","no"),
+          q("Have you ever overstayed in the U.S.?","Compliance","High","Immigrant","No.","no","yes"),
+          q("Have you ever been arrested or convicted?","Compliance","High","Immigrant","No.","no","yes"),
+          q("Are you carrying more than $10,000?","Customs","High","Immigrant","No.","no",""),
+          q("Do you have anything to declare?","Customs","High","Immigrant","No.","no",""),
+          q("Are you bringing food or plants?","Customs","High","Immigrant","No.","no","food,plants"),
+          q("What is your sponsor's address and phone number?","Sponsor","High","Immigrant","I have it in my documents.","address,phone,documents","not sure"),
+          q("What will you do after you arrive?","Intent","High","Immigrant","Live at my address and follow the process.","live,follow,process","not sure"),
+          q("Have you paid the USCIS immigrant fee?","Docs","High","Immigrant","Yes.","uscis,fee,paid","no"),
+          q("Do you have your medical exam and police certificate?","Docs","High","Immigrant","Yes.","medical,police","no"),
+          q("Who is meeting you today?","Arrival","Low","Immigrant","My spouse.","spouse","not sure")
+        ]
+      }
+    };
+
+    function q(text, topic, risk, scenarioTag, modelAnswer, keywordsCSV, riskyCSV){
+
+      const keywords = keywordsCSV ? keywordsCSV.split(",").map(s=>s.trim()).filter(Boolean) : [];
+      const riskyPhrases = riskyCSV ? riskyCSV.split(",").map(s=>s.trim()).filter(Boolean) : [];
+      return { text, topic, risk, scenarioTag, modelAnswer, keywords, riskyPhrases };
+    }
+
+    function pickRandomQuestion(){
+      const level = levelSelect.value;
+      const persona = personaSelect.value;
+      const bank = (QUESTION_BANKS[persona] && QUESTION_BANKS[persona][level]) ? QUESTION_BANKS[persona][level] : [];
+      if (!bank.length){
+        return QUESTION_BANKS.tourist.A1[Math.floor(Math.random() * QUESTION_BANKS.tourist.A1.length)];
+      }
+      return bank[Math.floor(Math.random() * bank.length)];
+    }
+
+    function renderQuestion(){
+      if (!current){
+        if (questionText) questionText.textContent = 'Press "Next question" to start.';
+        if (questionHint) questionHint.textContent = 'First listen. Then read (optional).';
+        if (meaningText) meaningText.textContent = 'Нажми “Next question”. Здесь появится краткий смысл вопроса и как отвечать.';
+        if (meaningExample) meaningExample.textContent = 'Example: —';
+        repeatBtn.disabled = true;
+        submitBtn.disabled = true;
+        return;
+      }
+      chipLevel.textContent = "Level: " + levelSelect.value;
+      chipTopic.textContent = "Topic: " + current.topic;
+      chipRisk.textContent = "Risk: " + current.risk;
+      const personaLabel = {tourist:"Tourism", student:"Study", work:"Work visa", immigrant:"Immigration"}[personaSelect.value] || "Tourism";
+      chipPersona.textContent = "Traveler: " + personaLabel;
+      const mng = buildMeaningRU(current);
+      if (meaningText) meaningText.textContent = mng.ru;
+      if (meaningExample) meaningExample.textContent = mng.ex;
+      scenarioTag.textContent = "Scenario: " + current.scenarioTag;
+
+      lastQuestionText = current.text;
+
+      if (showTranscript.checked){
+        if (questionText) questionText.textContent = current.text;
+        if (questionHint) questionHint.textContent = "Answer short. Do not add extra details.";
+      } else {
+        if (questionText) questionText.textContent = "— Audio only —";
+        if (questionHint) questionHint.textContent = "Use listening only mode. (Turn ON \"Show transcript\" if you want to read.)";
+      }
+
+      updateModeRulesUI();
+      const mode = getMode();
+      // Disable repeat if limit reached (strict/fast)
+      if (repeatLimit !== Infinity && repeatsUsed >= repeatLimit){
+        repeatBtn.disabled = true;
+      } else {
+        repeatBtn.disabled = false;
+      }
+      submitBtn.disabled = false;
+    }
+
+    function nextQuestion(){
+      awaitingNext = false;
+      if (nextBtn) nextBtn.disabled = true;
+
+      // If strict mode triggered a follow-up, ask it before moving on
+      if (pendingFollowUp){
+        // Convert follow-up into a temporary question object
+        current = {
+          text: pendingFollowUp,
+          topic: "Follow-up",
+          risk: "High",
+          scenarioTag: "Strict follow-up",
+          modelAnswer: "Answer short and directly.",
+          keywords: ["yes","no","hotel","queens","new york","return","ticket","dollars","tourism","two weeks"],
+          riskyPhrases: ["work","job","opportunity","move","relocate","stay forever","one-way","not sure"]
+        };
+        pendingFollowUp = null;
+      } else {
+        current = pickRandomQuestion();
+      }
+
+      repeatsUsed = 0;
+      updateModeRulesUI();
+
+      answerBox.value = "";
+      stopTimer();
+      finalTranscript = "";
+      interimTranscript = "";
+
+      modelAnswerBox.style.display = "none";
+      modelAnswerBox.textContent = "";
+      setOfficerPhrase("", getMode());
+      setStatus("Waiting.", "Listen to the question, then answer.", null);
+
+      /* do not force transcript off */ showTranscript.checked = showTranscript.checked;
+    renderQuestion();
+      updateOfficerMeta();
+
+      // Start timer only in FAST mode
+      startTimer();
+
+      speak(current.text);
+    }
+
+    function repeatQuestion(){
+      if (!lastQuestionText) return;
+
+      const mode = getMode();
+      repeatLimit = getRepeatLimit(mode);
+
+      if (repeatLimit !== Infinity && repeatsUsed >= repeatLimit){
+        setOfficerPhrase("Answer now.", mode);
+        setStatus("No repeats left.", "In this mode, you have limited repeats.", "warn");
+        repeatBtn.disabled = true;
+        return;
+      }
+
+      repeatsUsed += 1;
+      updateModeRulesUI();
+
+      if (repeatLimit !== Infinity && repeatsUsed >= repeatLimit){
+        repeatBtn.disabled = true;
+      }
+
+      speak(lastQuestionText);
+    }
+
+    showTranscript.addEventListener("change", renderQuestion);
+    levelSelect.addEventListener("change", () => { updateModeRulesUI(); renderQuestion(); });
+    speedSelect.addEventListener("change", () => { /* affects TTS only */ });
+
+    function toggleNoise(){
+      noiseOn = !noiseOn;
+      if (noiseOn){
+        airportAudio.volume = 0.10;
+        airportAudio.play().catch(() => {});
+        toggleNoiseBtn.textContent = "Airport noise: On";
+      } else {
+        airportAudio.pause();
+        toggleNoiseBtn.textContent = "Airport noise: Off";
+      }
+    }
+    toggleNoiseBtn.addEventListener("click", toggleNoise);
+
+    function normalize(s){
+      return (s || "")
+        .toLowerCase()
+        .replace(/[^\w\s$]/g, " ")
+        .replace(/\s+/g, " ")
+        .trim();
+    }
+
+    function containsAny(text, arr){
+      const t = normalize(text);
+      return arr.some(k => t.includes(normalize(k)));
+    }
+
+    
+    // Semantic-ish scoring: focus on intent, not exact wording.
+    
+    function personaLabelRU(){
+      const v = personaSelect ? personaSelect.value : "tourist";
+      return {
+        tourist: "Туризм/гости (B1/B2)",
+        student: "Учёба (F-1/M-1)",
+        work: "Рабочая виза (H-1B/O-1/L-1)",
+        immigrant: "Иммиграция (GC/DV)"
+      }[v] || "Туризм/гости (B1/B2)";
+    }
+
+    function buildMeaningRU(qObj){
+      const qText = (qObj && qObj.text) ? qObj.text : "";
+      const topic = (qObj && qObj.topic) ? qObj.topic : "General";
+      const qType = inferQuestionType(qText);
+      const persona = personaSelect ? personaSelect.value : "tourist";
+
+      // Special-case for confusing questions:
+      const lt = qText.toLowerCase();
+      if (lt.includes("prove your relationship")){
+        return {
+          ru: "Просят подтвердить родство/отношения (например, брак): показать документы или доказательства.",
+          ex: "Example: Yes. I have documents/photos/messages."
+        };
+      }
+      if (lt.includes("anything to declare")){
+        return { ru: "Спрашивают, есть ли что-то, что нужно декларировать на таможне.", ex:"Example: No, nothing to declare." };
+      }
+      if (lt.includes("carrying more than") && lt.includes("10,000")){
+        return { ru: "Спрашивают, везёте ли вы наличными больше $10,000.", ex:"Example: No." };
+      }
+
+      // Topic-based templates
+      const templates = {
+        Purpose: {
+          tourist: { ru:"Спрашивают цель поездки (туризм/гости/отдых/шопинг/лечение/конференция).", ex:"Example: Tourism. One week." },
+          student: { ru:"Спрашивают цель въезда: учёба (по I‑20).", ex:"Example: I'm here to study. I have my I‑20." },
+          work: { ru:"Спрашивают цель въезда: работа по рабочей визе у указанного работодателя.", ex:"Example: I'm entering to work for ABC." },
+          immigrant: { ru:"Спрашивают цель въезда: иммиграция/ПМЖ (иммигрантская виза/GC).", ex:"Example: I'm immigrating as a permanent resident." }
+        },
+        Duration: { ru:"Спрашивают, на какой срок вы приезжаете. Нужны точные дни/недели/дата вылета.", ex:"Example: Seven days. I fly back on March 1st." },
+        Lodging: { ru:"Спрашивают, где вы будете жить (отель/общежитие/адрес).", ex:"Example: At a hotel in Manhattan." },
+        Location: { ru:"Спрашивают город/место назначения.", ex:"Example: New York City." },
+        Return: { ru:"Спрашивают про обратный билет/дату возвращения.", ex:"Example: Yes. I return next Friday." },
+        Funds: { ru:"Спрашивают, сколько денег/кто оплачивает/как финансируете поездку.", ex:"Example: I’m paying. About $800." },
+        Customs: { ru:"Таможенные вопросы: еда/растения/товары на продажу/декларация/наличные.", ex:"Example: No. Nothing to declare." },
+        Documents: { ru:"Просят документы (I‑20/SEVIS/approval/offer letter/immigrant packet).", ex:"Example: Yes. Here it is." },
+        Compliance: { ru:"Проверяют соблюдение правил (оверстей, работа не по статусу и т.д.).", ex:"Example: No. I never overstayed." },
+        School: { ru:"Уточняют данные об учебе (школа/специальность).", ex:"Example: Queens College. Music production." },
+        Housing: { ru:"Уточняют проживание в США (dorm/адрес).", ex:"Example: In the campus dorms." },
+        Employer: { ru:"Уточняют работодателя/должность/адрес работы.", ex:"Example: ABC Tech. Software engineer." },
+        Sponsor: { ru:"Уточняют спонсора/отношения (для иммиграции).", ex:"Example: My spouse. I have proof." },
+        Address: { ru:"Просят точный адрес в США (для доставки документов/GC).", ex:"Example: 123 Example St, Queens, NY." },
+        General: { ru:"Отвечайте коротко и прямо по вопросу.", ex:"Example: Yes / No + 1 detail." }
+      };
+
+      // If yes/no question, mention it
+      let base = null;
+      if (templates[topic]){
+        base = templates[topic][persona] || templates[topic];
+      } else {
+        base = templates.General;
+      }
+
+      let ru = base.ru || templates.General.ru;
+      let ex = base.ex || templates.General.ex;
+
+      if (qType === "yesno"){
+        ru += " Это вопрос Yes/No: достаточно «Yes» или «No» + 1 слово (если нужно).";
+      } else if (qType === "duration"){
+        ru += " Лучше назвать число (7 days / 2 weeks) или дату.";
+      } else if (qType === "location"){
+        ru += " Назовите конкретное место/город/адрес.";
+      }
+
+      // If we have modelAnswer, use it as example but keep short
+      if (qObj && qObj.modelAnswer){
+        ex = "Example: " + qObj.modelAnswer;
+      }
+
+      return { ru, ex };
+    }
+
+    function inferQuestionType(qText){
+      const q = (qText || "").toLowerCase().trim();
+      if (/^(do|did|are|is|was|were|have|has|can|will|would)\b/.test(q)) return "yesno";
+      if (q.startsWith("how long") || q.includes("how many days") || q.includes("how many weeks") || q.includes("how many months")) return "duration";
+      if (q.startsWith("where") || q.includes("what city") || q.includes("address")) return "location";
+      if (q.startsWith("who")) return "person";
+      if (q.includes("purpose") || q.includes("why") || q.includes("what places") || q.includes("itinerary")) return "purpose";
+      if (q.includes("how much") || q.includes("money") || q.includes("fund")) return "funds";
+      if (q.includes("declare") || q.includes("food") || q.includes("plants") || q.includes("$10,000") || q.includes("restricted")) return "customs";
+      if (q.includes("i-20") || q.includes("sevis") || q.includes("receipt") || q.includes("approval") || q.includes("offer letter") || q.includes("packet")) return "documents";
+      return "general";
+    }
+
+    function detectYesNo(answerNorm){
+      // Accept many "yes" variants that appear in real speech
+      if (!answerNorm) return null;
+      const a = answerNorm;
+      // Guard: phrases like "I don't remember" are uncertainty, not a clean Yes/No.
+      if (/\b(don\'t remember|i don\'t remember|can\'t remember|cant remember|cannot remember)\b/.test(a)) return null;
+
+      const yesPatterns = [
+        /\byes\b/, /\byep\b/, /\byeah\b/, /\byup\b/,
+        /\bi do\b/, /\bi did\b/, /\bi have\b/, /\bi am\b/, /\bi will\b/,
+        /\bcorrect\b/, /\bthat's right\b/, /\bof course\b/, /\babsolutely\b/, /\bsure\b/
+      ];
+      const noPatterns = [
+        /\bno\b/, /\bnope\b/, /\bnot\b/, /\bdo not\b/, /\bdon't\b/, /\bdid not\b/, /\bdidn't\b/,
+        /\bhave not\b/, /\bhaven't\b/, /\bam not\b/, /\bnot really\b/
+      ];
+      if (yesPatterns.some(r => r.test(a))) return "yes";
+      if (noPatterns.some(r => r.test(a))) return "no";
+      return null;
+    }
+
+    function hasNumberLike(answerNorm){
+      return /\b\d+\b/.test(answerNorm) || /\b(one|two|three|four|five|six|seven|eight|nine|ten|week|weeks|day|days|month|months|year|years)\b/.test(answerNorm);
+    }
+
+    function hasDateLike(answerNorm){
+      return /\b(jan|feb|mar|apr|may|jun|jul|aug|sep|sept|oct|nov|dec)\b/.test(answerNorm) ||
+             /\b(monday|tuesday|wednesday|thursday|friday|saturday|sunday)\b/.test(answerNorm) ||
+             /\b\d{1,2}\/\d{1,2}(\/\d{2,4})?\b/.test(answerNorm);
+    }
+
+    
+    const SYN = {
+      yes: ["yes","yeah","yep","yup","correct","that's right","of course","absolutely","sure","i do","i did","i have","i am"],
+      no: ["no","nope","not","don't","do not","didn't","did not","haven't","have not","am not"],
+      purpose_tourist: ["tourism","vacation","visit","holiday","shopping","conference","meeting","medical","treatment","sightseeing"],
+      purpose_student: ["study","school","college","university","language school","program","class"],
+      purpose_work: ["work","employment","job","start work","my employer","petitioning employer","transfer"],
+      purpose_immigrant: ["immigrat","permanent","resident","green card","dv","lottery","immigrant visa"],
+      lodging: ["hotel","dorm","campus","airbnb","apartment","home","hostel","reservation","booking"],
+      location: ["new york","nyc","queens","manhattan","brooklyn","jfk","city","address","street","avenue","campus"],
+      funds: ["cash","dollars","usd","card","credit","debit","savings","bank","statement","paid","paying"],
+      customs: ["declare","nothing","food","plants","meat","seeds","items for sale","commercial","ten thousand","10000"]
+    };
+
+    
+    // Rubric-based scoring (STRICT RULESET): judge *how* the person talks, not just meaning.
+    function countSentences(raw){
+      const s = (raw || "").trim();
+      if (!s) return 0;
+      // Count sentence-like chunks (., !, ?, line breaks). Treat very long comma chains as multiple.
+      const parts = s
+        .replace(/\n+/g, ". ")
+        .split(/(?<=[\.\!\?])\s+|(?:\s*[\n\r]+\s*)/g)
+        .map(x => x.trim())
+        .filter(Boolean);
+      if (parts.length >= 1) return parts.length;
+      return 1;
+    }
+
+    function getStrictness(level, persona, mode){
+      // 0 = lenient, 1 = medium, 2 = strict
+      let s = 1;
+      if (level === "A1") s = 0;
+      if (level === "A2") s = 1;
+      if (level === "B1") s = 2;
+
+      // traveler category pressure
+      if (persona === "work" || persona === "immigrant") s = Math.min(2, s + 1);
+
+      // Officer style
+      if (mode === "strict") s = 2;
+      if (mode === "calm") s = Math.max(0, s - 1);
+
+      return s;
+    }
+
+    function escapeRegExp(str){
+      return String(str).replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+    }
+
+    function findHits(textNorm, lex){
+      const hits = [];
+      for (const w of lex){
+        if (!w) continue;
+        const pat = new RegExp("\\b" + escapeRegExp(w) + "\\b", "i");
+        if (pat.test(textNorm)) hits.push(w);
+      }
+      return hits;
+    }
+
+    function safeRewriteForCurrent(){
+      // Use provided model answer as safest rewrite
+      if (current && current.modelAnswer) return current.modelAnswer;
+      // fallback
+      const qt = inferQuestionType(current ? current.text : "");
+      if (qt === "yesno") return "Yes.";
+      if (qt === "duration") return "Seven days.";
+      if (qt === "location") return "New York City.";
+      if (qt === "purpose") return "Tourism.";
+      return "Yes.";
+    }
+
+    function purposeCategory(textNorm){
+      // Return a single normalized category if detected
+      const cats = [];
+      const add = (name, list) => { if (containsAny(textNorm, list)) cats.push(name); };
+
+      add("tourism", ["tourism","vacation","holiday","visit","sightseeing","shopping"]);
+      add("visit_family", ["visiting family","visiting friends","friends","family"]);
+      add("business", ["business","meeting","conference","client"]);
+      add("study", ["study","school","college","university","class"]);
+      add("work", ["work","job","employment"]);
+      add("immigration", ["immigrat","permanent","resident","green card","dv lottery","lottery"]);
+
+      // De-dup
+      return Array.from(new Set(cats));
+    }
+
+    function durationSpecific(textNorm){
+      // Specific if it has a number or a concrete date/day-of-week
+      if (hasNumberLike(textNorm)) return true;
+      if (hasDateLike(textNorm)) return true;
+      // vague words
+      if (containsAny(textNorm, ["about","around","approximately","some time","a while","as long as","as long as i can","not sure"])) return false;
+      return false;
+    }
+
+    function buildRuleExplanation(violations){
+      // Short, rule-based explanation
+      const map = {
+        "length_paragraph": {
+          rule: "Sentence length rule",
+          why: "Long answers sound like a story. Officers may ask more questions.",
+          fix: "Use 1 short sentence (max 2)."
+        },
+        "extra_info": {
+          rule: "Answer scope rule",
+          why: "Extra details give the officer more to dig into.",
+          fix: "Answer only what was asked."
+        },
+        "forbidden_future": {
+          rule: "Forbidden vocabulary: future/permanence",
+          why: "Sounds like intent to stay or relocate.",
+          fix: "Remove any future/long-term language."
+        },
+        "forbidden_work": {
+          rule: "Forbidden vocabulary: work/income",
+          why: "May signal unauthorized work intent.",
+          fix: "Never mention work/money unless your status is work-related and you are asked."
+        },
+        "forbidden_uncertainty": {
+          rule: "Forbidden vocabulary: uncertainty",
+          why: "Uncertainty about key facts is a red flag.",
+          fix: "Give a clear, specific fact."
+        },
+        "forbidden_emotion": {
+          rule: "Forbidden vocabulary: emotional justification",
+          why: "Motivation stories sound suspicious or invite follow-ups.",
+          fix: "Remove emotion and motivation; keep it factual."
+        },
+        "purpose_mixed": {
+          rule: "Purpose rule",
+          why: "Mixing purposes sounds inconsistent.",
+          fix: "Give ONE clear purpose category."
+        },
+        "duration_vague": {
+          rule: "Duration rule",
+          why: "Vague/indefinite duration suggests flexibility to overstay.",
+          fix: "Give a specific, finite duration (e.g., 'Ten days')."
+        }
+      };
+
+      const lines = [];
+      for (const v of violations){
+        const item = map[v];
+        if (!item) continue;
+        lines.push(`• Violated: ${item.rule}. Why risky: ${item.why} Fix: ${item.fix}`);
+      }
+      return lines.join("\n");
+    }
+
+    function scoreAnswer(ans){
+      const mode = getMode();
+      const level = levelSelect.value;
+      const persona = personaSelect ? personaSelect.value : "tourist";
+      const strictness = getStrictness(level, persona, mode); // 0/1/2
+
+      const raw = (ans || "").trim();
+      const t = normalize(raw);
+      if (!t){
+        return { grade:"bad", label:"No answer.", detail:"Speak or type a short answer.", showModel:true, reason:"empty", rewrite:safeRewriteForCurrent() };
+      }
+
+      // Stop FAST timer on submit
+      if (mode === "fast") stopTimer();
+
+      const words = t.split(" ").filter(Boolean);
+      const sentenceCount = countSentences(raw);
+
+      // Length rubric
+      const isParagraph = sentenceCount >= 3 || words.length >= 28;
+
+      // Forbidden vocabulary (automatic negative) — always risky; often fail depending on strictness
+      const FUTURE = ["move","relocate","live here","stay longer","see what happens","maybe stay","if i like it","permanent","forever","settle"];
+      const WORK = ["work","job","business opportunities","clients","projects","make money","freelance","income"];
+      const UNCERT = ["maybe","not sure","depends","i don\'t know","we\'ll see","i guess","probably","i don\'t remember","don\'t remember","i can\'t remember","cant remember","cannot remember","i dont remember","dont remember","i can t remember","can t remember","cant remember","i don t remember","don t remember"];
+      const EMOTION = ["dream","dreams","goals","always wanted","my life","my situation","family problems","because i like","i love","excited","nervous","sorry"];
+
+      const hitsFuture = findHits(t, FUTURE);
+      const hitsWork = findHits(t, WORK);
+      const hitsUncert = findHits(t, UNCERT);
+      const hitsEmotion = findHits(t, EMOTION);
+
+      // Also include legacy risky phrases configured per question
+      const riskyHit = (current.riskyPhrases && current.riskyPhrases.length) ? containsAny(t, current.riskyPhrases) : false;
+
+      // Question-type rules
+      const qType = inferQuestionType(current ? current.text : "");
+      const topic = current ? current.topic : "General";
+
+      const violations = [];
+      const warnings = [];
+
+      // Sentence length rule
+      if (isParagraph) violations.push("length_paragraph");
+      else if (sentenceCount === 2 && strictness === 2) warnings.push("extra_info"); // in strict, 2 sentences is "risky"
+      else if (sentenceCount === 2) warnings.push("extra_info");
+
+      // Forbidden categories
+      if (hitsFuture.length || riskyHit) violations.push("forbidden_future");
+      if (hitsWork.length) violations.push("forbidden_work");
+      if (hitsUncert.length) violations.push("forbidden_uncertainty");
+      if (hitsEmotion.length) violations.push("forbidden_emotion");
+
+      // Purpose rule: must be one category, must fit persona (softly for A1)
+      if (qType === "purpose" || topic === "Purpose"){
+        const cats = purposeCategory(t);
+        if (cats.length >= 2) violations.push("purpose_mixed");
+        // Persona mismatch: e.g., tourist talking about work/immigration
+        if (persona === "tourist" && (cats.includes("work") || cats.includes("immigration") || cats.includes("study"))){
+          violations.push("forbidden_future");
+        }
+        if (persona === "student" && cats.includes("work")){
+          warnings.push("extra_info");
+        }
+      }
+
+      // Duration rule
+      if (qType === "duration" || topic === "Duration"){
+        if (!durationSpecific(t) || containsAny(t, ["about a month","about a week","as long as i can","as long as possible","around"])){
+          violations.push("duration_vague");
+        }
+      }
+
+      // Evaluate meaning: still needed so user doesn't answer unrelated
+      const keywordHit = (current && current.keywords && current.keywords.length) ? containsAny(t, current.keywords) : false;
+      let meaningOK = true;
+      if (qType === "yesno"){
+        meaningOK = detectYesNo(t) !== null || keywordHit;
+      } else if (qType === "location"){
+        meaningOK = keywordHit || containsAny(t, ["hotel","dorm","address","street","city","new york","nyc","queens","manhattan","campus"]);
+      } else if (qType === "duration"){
+        meaningOK = durationSpecific(t) || keywordHit;
+      } else if (qType === "purpose"){
+        meaningOK = purposeCategory(t).length >= 1 || keywordHit;
+      } else if (qType === "funds"){
+        meaningOK = hasNumberLike(t) || keywordHit || containsAny(t, ["card","cash","savings","bank"]);
+      }
+
+      if (!meaningOK){
+        // Not answering the question directly is a fail in real CBP style.
+        violations.push("non_answer");
+      }
+
+      // Decide grade
+      const hasHardViolation = violations.length > 0;
+      const hasWarnings = warnings.length > 0;
+
+      const rewrite = safeRewriteForCurrent();
+
+      // Strictness gate:
+      // - strictness 2: any forbidden/fail rule => BAD; 2 sentences => RISKY; otherwise GOOD
+      // - strictness 1: forbidden/fail => BAD; warnings => RISKY
+      // - strictness 0: forbidden/fail => BAD only if future/work; otherwise warnings/rubric => RISKY
+      const failTriggers = new Set(["forbidden_future","forbidden_work","forbidden_uncertainty","forbidden_emotion","purpose_mixed","duration_vague","length_paragraph","non_answer"]);
+
+      const failNow = violations.some(v => failTriggers.has(v));
+
+      if (failNow){
+        const detail = buildRuleExplanation(violations) + "\n\nSafe rewrite:\n" + rewrite;
+        if (mode === "strict") pendingFollowUp = chooseFollowUp("unknown");
+        return {
+          grade:"bad",
+          label:"BAD (fail).",
+          detail: detail.trim(),
+          showModel:true,
+          reason:"rules",
+          rewrite
+        };
+      }
+
+      // Warnings / risky
+      if (hasWarnings || sentenceCount === 2 || words.length > getWordLimit(level, mode)){
+        const warnList = warnings.length ? warnings : ["extra_info"];
+        const detail = buildRuleExplanation(warnList) + "\n\nSafe rewrite:\n" + rewrite;
+        return {
+          grade:"warn",
+          label:"RISKY (warn).",
+          detail: detail.trim(),
+          showModel:true,
+          reason:"risky",
+          rewrite
+        };
+      }
+
+      return {
+        grade:"good",
+        label:"GOOD (pass).",
+        detail:"Direct, short, neutral. No risky language.",
+        showModel:false,
+        reason:"ok",
+        rewrite
+      };
+    }
+
+
+
+    function setStatus(label, detail, grade){
+      statusLabel.textContent = label;
+      statusLabel.className = "status" + (grade ? " " + grade : "");
+      statusText.textContent = detail;
+    }
+
+    function showModelAnswer(){
+      if (!current) return;
+      modelAnswerBox.style.display = "block";
+      modelAnswerBox.textContent =
+`Model answer (safe):
+${current.modelAnswer}
+
+Avoid:
+${(current.riskyPhrases && current.riskyPhrases.length) ? current.riskyPhrases.slice(0,6).join(", ") : "-"}`;
+    }
+
+    function submitAnswer(){
+      if (!current) return;
+      const mode = getMode();
+      const res = scoreAnswer(answerBox.value);
+
+      // After submitting, NEVER auto-advance. User must press Next.
+      awaitingNext = true;
+      if (nextBtn) nextBtn.disabled = false;
+
+      if (res.grade === "good"){
+        setStatus(res.label, res.detail, "good");
+        modelAnswerBox.style.display = "none";
+        setOfficerPhrase(pickOfficerPhrase("ok", mode), mode);
+        return;
+      }
+
+      if (res.grade === "warn"){
+        setStatus(res.label, res.detail, "warn");
+        setOfficerPhrase(pickOfficerPhrase("warn", mode), mode);
+        showModelAnswer();
+        return;
+      }
+
+      // bad
+      setStatus(res.label, res.detail, "bad");
+      setOfficerPhrase(pickOfficerPhrase("bad", mode), mode);
+      showModelAnswer();
+    }
+
+    clearBtn.addEventListener("click", () => {
+      answerBox.value = "";
+      stopTimer();
+      setStatus("Waiting.", "Speak or type your answer, then submit.", null);
+    });
+
+    submitBtn.addEventListener("click", submitAnswer);
+
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    let recognition = null;
+
+    
+    // Speech recognition transcript buffers to avoid duplicated text
+    let finalTranscript = "";
+    let interimTranscript = "";
+function canRecognize(){ return !!SpeechRecognition; }
+
+    function startRecognition(){
+      if (!canRecognize()){
+        setStatus("Microphone unavailable.", "Speech Recognition not supported here. Type your answer and submit.", "warn");
+        return;
+      }
+      // Initialize buffers from current text (in case user typed)
+      finalTranscript = (answerBox.value || "").trim();
+      interimTranscript = "";
+if (!recognition){
+        recognition = new SpeechRecognition();
+        recognition.lang = "en-US";
+        recognition.interimResults = true;
+        recognition.continuous = true;
+
+        recognition.onresult = (event) => {
+          // Web Speech API often re-emits interim text; keep separate buffers.
+          interimTranscript = "";
+          for (let i = event.resultIndex; i < event.results.length; i++){
+            const transcript = (event.results[i][0].transcript || "").trim();
+            if (!transcript) continue;
+
+            if (event.results[i].isFinal){
+              // Append only newly finalized chunk once
+              finalTranscript = (finalTranscript + " " + transcript).replace(/\s+/g, " ").trim();
+            } else {
+              // Keep latest interim chunk (do not commit)
+              interimTranscript = transcript;
+            }
+          }
+          const combined = (finalTranscript + " " + interimTranscript).replace(/\s+/g, " ").trim();
+          answerBox.value = combined;
+        };
+
+        recognition.onerror = () => {
+          stopRecognition();
+          setStatus("Mic error.", "Speech Recognition failed. Type your answer and submit.", "warn");
+        };
+
+        recognition.onend = () => {
+          if (recognizing) stopRecognition(false);
+        };
+      }
+
+      recognizing = true;
+      micDot.classList.add("on");
+      micLabel.textContent = "Stop microphone";
+      setStatus("Listening.", "Speak clearly. Keep it short.", null);
+
+      try{ recognition.start(); } catch(e){}
+    }
+
+    function stopRecognition(userClick=true){
+      interimTranscript = "";
+      answerBox.value = finalTranscript;
+      recognizing = false;
+      micDot.classList.remove("on");
+      micLabel.textContent = "Start microphone";
+      if (recognition){ try{ recognition.stop(); } catch(e){} }
+      if (userClick) setStatus("Ready.", "Review your answer, then submit.", null);
+    }
+
+    micBtn.addEventListener("click", () => {
+      if (!current){
+        setStatus("No question yet.", "Press 'Next question' first.", "warn");
+        return;
+      }
+      if (!recognizing) startRecognition();
+      else stopRecognition(true);
+    });
+
+    nextBtn.addEventListener("click", nextQuestion);
+    repeatBtn.addEventListener("click", repeatQuestion);
+    styleSelect.addEventListener("change", () => { updateOfficerMeta(); updateModeRulesUI(); });
+    personaSelect.addEventListener("change", () => { updateModeRulesUI(); renderQuestion(); });
+
+    updateOfficerMeta();
+
+    if (!canRecognize()){
+      answerBox.placeholder = "Speech Recognition is not supported in this browser. Type your answer here, then Submit.";
+    }
+  </script>
+</body>
+</html>
